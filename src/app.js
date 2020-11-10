@@ -5,6 +5,7 @@ const cors = require('cors')
 const helmet = require('helmet')
 const { NODE_ENV } = require("./config");
 const plantsRouter = require('./plants/plants-router')
+const usersRouter = require('./users/users-router')
 
 const app = express()
 
@@ -18,6 +19,7 @@ app.use(cors())
 
 
 app.use('/api/plants', plantsRouter)
+app.use('/api/users', usersRouter)
 
 
 app.get('/', (req, res) =>{
