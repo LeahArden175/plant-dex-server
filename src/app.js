@@ -4,7 +4,7 @@ const morgan = require('morgan')
 const cors = require('cors')
 const helmet = require('helmet')
 const { NODE_ENV } = require("./config");
-const PlantsService = require('./plants/plants-service')
+const plantsRouter = require('./plants/plants-router')
 
 const app = express()
 
@@ -17,17 +17,11 @@ app.use(helmet())
 app.use(cors())
 
 
+app.use('/api/plants', plantsRouter)
+
+
 app.get('/', (req, res) =>{
     res.send('Hello, boilerplate!')
-})
-
-app.get('/api/plants', (req ,res, next) => {
-    const knexInstance = req.app.get('db')
-    PlantsService.getAllPlants(knexInstance)
-        .then(plants => {
-            res.json(plants)
-        })
-        .catch(next)
 })
 
 app.use(function errorHandler(error, req, res, next) {

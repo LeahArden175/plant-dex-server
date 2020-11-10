@@ -14,6 +14,23 @@ const PlantsService = {
             .then(rows => {
                 return rows[0]
             })
+    },
+    getById(knex, id) {
+        return knex
+            .from('plant_dex_plant_info')
+            .select('*')
+            .where({ id })
+            .first()
+    },
+    deletePlant(knex, id){
+        return knex('plant_dex_plant_info')
+            .where({ id })
+            .delete()
+    },
+    editPlant(knex, id , newPlantFields){
+        return knex('plant_dex_plant_info')
+            .where({ id })
+            .update(newPlantFields)
     }
 }
 
