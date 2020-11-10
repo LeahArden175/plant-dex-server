@@ -52,4 +52,55 @@ const serializeUser = user => ({
       .catch(next)
   })
 
+  usersRouter
+    .route('/:user_id')
+    .all((req,res, next) => {
+        UsersService.getById(
+            req.app.get('db'),
+            req.params.user_id
+        )
+        .then(user => {
+            if(!user) {
+                return res.status(404).json({
+                    error: {message: 'User does not exist'}
+                })
+            }
+            res.user = user
+            next()
+        })
+        .catch(next)
+    })
+    .get((req, res, next) => {
+        res.json(serializeUser(res.user))
+    })
+    .delete((req, res, next) => {
+        UsersService.deleteUser(
+            req.app.get('db'),
+            req.params.user_id
+        )
+        .then(numRowsAffected => {
+            res.status(204).end()
+        })
+        .catch(next)
+    })
+    .patch(jsonParser, (req, res, next) => {
+        const {full_name, username, nickname, password} = req.body
+        const userToUpdate = { full_name, username, password, nickname }
+
+        const numberOfValues = Object.values(userToUpdate).filter(Boolean).length
+        if(numberOfValues === 0)
+            return res.status(400).json({
+                error: {message: 'Request body must contain either full_name, username, password, or nickname '}
+            })
+            UsersService.updateUser(
+                req.app.get('db'),
+                req.params.user_id,
+                userToUpdate
+            )
+            .then(numRowsAffected => {
+                res.status(204).end()
+            })
+            .catch(next)
+    })
+
 module.exports = usersRouter  
