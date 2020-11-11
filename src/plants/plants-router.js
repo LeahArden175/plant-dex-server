@@ -2,7 +2,7 @@ const express = require('express')
 const path = require('path')
 const PlantsService = require('./plants-service')
 const { json } = require('express')
-const {requireAuth} = require('../middleware/basic-auth')
+const {requireAuth} = require('../middleware/jwt-auth')
 
 
 const plantsRouter = express.Router()
