@@ -2,6 +2,7 @@ const express = require('express')
 const path = require('path')
 const PlantsService = require('./plants-service')
 const { json } = require('express')
+const {requireAuth} = require('../middleware/basic-auth')
 
 
 const plantsRouter = express.Router()
@@ -9,6 +10,7 @@ const jsonParser = express.json()
 
 plantsRouter
     .route('/')
+    .all(requireAuth)
     .get((req, res, next) => {
         const knexInstance = req.app.get('db')
         PlantsService.getAllPlants(knexInstance)
@@ -17,8 +19,8 @@ plantsRouter
             })
             .catch(next)
     })
-    .post(jsonParser, (req, res, next) => {
-        const {nickname,scientificname, datepurchased, purchaseplace, user_id} = req.body
+    .post(requireAuth, jsonParser, (req, res, next) => {
+        const {nickname,scientificname, datepurchased, purchaseplace} = req.body
         const newPlant = {nickname,scientificname, datepurchased, purchaseplace}
         
         for(const [key, value] of Object.entries(newPlant)) {
@@ -28,7 +30,7 @@ plantsRouter
                 })
             }
         }
-        newPlant.user_id = user_id
+        newPlant.user_id = req.user.id
         PlantsService.insertPlant(
             req.app.get('db'),
             newPlant
@@ -44,6 +46,7 @@ plantsRouter
 
  plantsRouter
     .route('/:plant_id') 
+    .all(requireAuth)
     .all((req, res, next) => {
         PlantsService.getById(
             req.app.get('db'),

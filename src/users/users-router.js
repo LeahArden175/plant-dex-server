@@ -2,6 +2,7 @@ const path = require('path')
 const express = require('express')
 const xss = require('xss')
 const UsersService = require('./users-service')
+const {requireAuth} = require('../middleware/basic-auth')
 
 const usersRouter = express.Router()
 const jsonParser = express.json()
@@ -26,7 +27,7 @@ const serializeUser = user => ({
       })
       .catch(next)
   })
-  .post(jsonParser, (req,res,next) => {
+  .post(requireAuth, jsonParser, (req,res,next) => {
       const {full_name, username, nickname, password} = req.body
       const newUser = { full_name, username }
 
@@ -54,6 +55,7 @@ const serializeUser = user => ({
 
   usersRouter
     .route('/:user_id')
+    .all(requireAuth)
     .all((req,res, next) => {
         UsersService.getById(
             req.app.get('db'),
