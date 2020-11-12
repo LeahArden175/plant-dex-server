@@ -30,13 +30,13 @@ plantsRouter
             .catch(next)
     })
     .post(requireAuth, jsonParser, (req, res, next) => {
-        const {nickname,scientificname, datepurchased, purchaseplace} = req.body
-        const newPlant = {nickname,scientificname, datepurchased, purchaseplace}
+        const {nickname,scientificname, datepurchased, purchaseplace, user_id} = req.body
+        const newPlant = {nickname,scientificname, datepurchased, purchaseplace, user_id}
         
         for(const [key, value] of Object.entries(newPlant)) {
             if( value == null) {
                 return res.status(400).json({
-                    error: {message : `Missing ${key} is request body`}
+                    error: {message : `Missing ${key} in request body`}
                 })
             }
         }

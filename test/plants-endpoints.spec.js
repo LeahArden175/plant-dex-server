@@ -3,6 +3,8 @@ const knex = require('knex')
 const app = require('../src/app')
 const supertest = require('supertest')
 const helpers = require('./test-helpers')
+const { default: expectCt } = require('helmet/dist/middlewares/expect-ct')
+const { requireAuth } = require('../src/middleware/basic-auth')
 
 describe('Plants Endpoints', function() {
 
@@ -71,7 +73,7 @@ describe('Plants Endpoints', function() {
         })
     })
 
-    describe.only('GET /plants/:plant_id', () => {
+    describe('GET /plants/:plant_id', () => {
 
         context('Given there are no plants in the DB',() => {
 
@@ -119,4 +121,67 @@ describe('Plants Endpoints', function() {
             })
         })
     }) 
+    
+    describe('POST /api/plant', () => {
+        const testUsers = helpers.makeUsersArray();
+
+            beforeEach('insert users and plants', () => {
+                return db
+                    .into('plant_dex_users')
+                    .insert(testUsers)
+            })
+
+        it('creates a new plant, responding with 201 and the new plant', () => {
+            const newPlant= {
+                "nickname": 'TEST NICKNAME',
+                "scientificname": 'TEST PLANT',
+                "datepurchased": '2020-01-22T00:00:00.000Z',
+                "purchaseplace": 'TEST PLANT',
+                "user_id": 1
+              }
+
+              return supertest(app)
+              .post(`/api/plants`)
+              .set('Authorization', helpers.makeAuthHeader(testUsers[0]))
+              .send(newPlant)
+              .expect(201)
+              .expect(res => {
+                  expect(res.body.nickname).to.eql(newPlant.nickname)
+                  expect(res.body.scientificname).to.eql(newPlant.scientificname)
+                  expect(res.body.datepurchased).to.eql(newPlant.datepurchased)
+                  expect(res.body.purchaseplace).to.eql(newPlant.purchaseplace)
+                  expect(res.body.user_id).to.eql(newPlant.user_id)
+                  expect(res.body).to.have.property('id')
+                  expect(res.headers.location).to.eql(`/api/plants/${res.body.id}`)
+              })
+                .then(postRes => {
+                    supertest(app)
+                        .get(`/api/plants/${postRes.body.id}`)
+                        .expect(postRes.body)
+                }) 
+        })
+
+        const requiredFields = ['nickname', 'scientificname', 'user_id', 'datepurchased', 'purchaseplace']
+
+        requiredFields.forEach((field) =>{
+            const newPlant = {
+                nickname : 'TEST PLANT',
+                scientificname : 'TEST PLANT',
+                datepurchased : '2020-01-22T00:00:00.000Z',
+                purchaseplace : 'TEST PLANT',
+                user_id : testUsers[2].id
+            }
+            it(`responds with 400 and an error message when the '${field}' is missing`, () => {
+                delete newPlant[field]
+    
+                return supertest(app)
+                    .post('/api/plants')
+                    .set('Authorization', helpers.makeAuthHeader(testUsers[0]))
+                    .send(newPlant)
+                    .expect(400, {
+                        error: { message: `Missing ${field} in request body` }
+                    })
+            })
+        })
+    })
 })

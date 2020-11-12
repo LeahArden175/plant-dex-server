@@ -60,6 +60,12 @@ function makeAuthHeader(user, secret = process.env.JWT_SECRET) {
     })
     return `Bearer ${token}`
   }
+
+
+
+
+
+  
   function makeMaliciousPlant() {
     const maliciousPlant = {
       id: 911,
