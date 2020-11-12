@@ -93,7 +93,7 @@ plantsRouter
              plantToUpdate
          )
          .then(numRowsAffected => {
-             res.status(204).end()
+             res.status(200).json(numRowsAffected)
          })
          .catch(next)
     })

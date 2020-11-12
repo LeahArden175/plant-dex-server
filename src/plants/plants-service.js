@@ -31,6 +31,10 @@ const PlantsService = {
         return knex('plant_dex_plant_info')
             .where({ id })
             .update(newPlantFields)
+            .returning('*')
+            .then(rows => {
+                return rows[0]
+            })
     }
 }
 
