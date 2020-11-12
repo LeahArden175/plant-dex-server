@@ -1,5 +1,6 @@
 const express = require('express')
 const path = require('path')
+const xss = require('xss')
 const PlantsService = require('./plants-service')
 const { json } = require('express')
 const {requireAuth} = require('../middleware/jwt-auth')
@@ -7,6 +8,15 @@ const {requireAuth} = require('../middleware/jwt-auth')
 
 const plantsRouter = express.Router()
 const jsonParser = express.json()
+
+const serializePlant = plant => ({
+    id: plant.id,
+    purchaseplace: xss(plant.purchaseplace),
+    scientificname: xss(plant.title), //sanitize title
+    nickname: xss(plant.content),  //sanitize content
+    datepurchased: plant.date_published,
+    user_id: plant.user,
+})
 
 plantsRouter
     .route('/')
