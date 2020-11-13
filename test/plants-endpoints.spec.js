@@ -234,7 +234,7 @@ describe('Plants Endpoints', function() {
         })
     })
 
-    describe.only('PATCH /api/plants/:plant_id', () => {
+    describe('PATCH /api/plants/:plant_id', () => {
         context('Given no plants in the DB', () => {
 
             const testUsers = helpers.makeUsersArray();
