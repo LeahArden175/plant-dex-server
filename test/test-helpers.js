@@ -55,7 +55,6 @@ function makeUsersArray() {
   ];
 }
 function makeAuthHeader(user, secret = process.env.JWT_SECRET) {
-  console.log(process.env.JWT_SECRET);
   const token = jwt.sign({ user_id: user.id }, secret, {
     subject: user.username,
     algorithm: "HS256",
