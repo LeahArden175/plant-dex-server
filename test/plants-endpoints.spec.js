@@ -184,4 +184,151 @@ describe('Plants Endpoints', function() {
             })
         })
     })
+
+    describe('DELETE /api/plants/:plant_id', () => {
+        context('Given there are plants in the DB', () => {
+            const testPlants = helpers.makePlantInfoArray()
+            const testUsers = helpers.makeUsersArray();
+
+            beforeEach('insert users and plants', () => {
+                return db
+                    .into('plant_dex_users')
+                    .insert(testUsers)
+                    .then(() => {
+                        return db
+                            .into('plant_dex_plant_info')
+                            .insert(testPlants)
+                    })
+            })
+
+            it('responds with 204 and removes the specified plant', () => {
+                const idToDelete = 2
+                const expectedPlants = testPlants.filter(plant => plant.id !== idToDelete)
+                return supertest(app)
+                    .delete(`/api/plants/${idToDelete}`)
+                    .set('Authorization', helpers.makeAuthHeader(testUsers[0]))
+                    .expect(204)
+                    .then(res => {
+                        supertest(app)
+                            .get('/api/plants')
+                            .expect(expectedPlants)
+                    })
+            })
+        })
+        context('Given no plants in DB', () => {
+            const testUsers = helpers.makeUsersArray();
+
+            beforeEach('insert users and plants', () => {
+                return db
+                    .into('plant_dex_users')
+                    .insert(testUsers)
+            })
+
+            it('responds with 404', () => {
+                const plantId = 123
+                return supertest(app)
+                    .delete(`/api/plants/${plantId}`)
+                    .set('Authorization', helpers.makeAuthHeader(testUsers[0]))
+                    .expect(404, { error : {message: 'Plant does not exist'}})
+            })
+        })
+    })
+
+    describe.only('PATCH /api/plants/:plant_id', () => {
+        context('Given no plants in the DB', () => {
+
+            const testUsers = helpers.makeUsersArray();
+
+            beforeEach('insert users and plants', () => {
+                return db
+                    .into('plant_dex_users')
+                    .insert(testUsers)
+            })
+
+            it('responds with 404', () => {
+                const plantId = 123
+                return supertest(app)
+                    .patch(`/api/plants/${plantId}`)
+                    .set('Authorization', helpers.makeAuthHeader(testUsers[0]))
+                    .expect(404, {
+                        error: {message: 'Plant does not exist'}
+                    })                    
+            })
+        })
+        context('Given there are plants in the DB', () => {
+            const testPlants = helpers.makePlantInfoArray()
+            const testUsers = helpers.makeUsersArray();
+
+            beforeEach('insert users and plants', () => {
+                return db
+                    .into('plant_dex_users')
+                    .insert(testUsers)
+                    .then(() => {
+                        return db
+                            .into('plant_dex_plant_info')
+                            .insert(testPlants)
+                    })
+            })
+            it('responds with 204 and updates plant', () => {
+                const idToUpdate = 2
+                const updatePlant = {
+                    nickname: 'updated',
+                    scientificname: 'updated',
+                    datepurchased: '2020-01-22T00:00:00.000Z',
+                    purchaseplace: 'updated',
+                    user_id: 1
+                }
+                const expectedPlant ={
+                    ...testPlants[idToUpdate - 1],
+                    ...updatePlant
+                }
+                return supertest(app)
+                    .patch(`/api/plants/${idToUpdate}`)
+                    .set('Authorization', helpers.makeAuthHeader(testUsers[0]))
+                    .send(updatePlant)
+                    .expect(204)
+                    .then(res => {
+                        supertest(app)
+                            .get(`/api/plants/${idToUpdate}`)
+                            .set('Authorization', helpers.makeAuthHeader(testUsers[0]))
+                            .expect(expectedPlant)
+                    })
+            })
+            it('responds with 400 when no required fields supplied', () => {
+                const idToUpdate = 2
+                return supertest(app)
+                    .patch(`/api/plants/${idToUpdate}`)
+                    .set('Authorization', helpers.makeAuthHeader(testUsers[0]))
+                    .send({irrelevantField : 'foo' })
+                    .expect(400, {
+                        error: {message: 'Request body must contain either nickname, scientificname, datepurchased, or purchaseplace'}
+                    })
+            })
+            it('responds wth 204 when only editing some fields', () => {
+                const idToUpdate = 2
+                const updatePlant = {
+                    nickname : 'updated name'
+                }
+                const expectedPlant = {
+                    ...testPlants[ idToUpdate - 1],
+                    ...updatePlant
+                }
+
+                return supertest(app)
+                .patch(`/api/plants/${idToUpdate}`)
+                .set('Authorization', helpers.makeAuthHeader(testUsers[0]))
+                .send({
+                    ...updatePlant,
+                    fieldToIgnore: 'Should not be in GET response'
+                })
+                .expect(204)
+                .then(res => {
+                    supertest(app)
+                        .get(`/api/plants/${idToUpdate}`)
+                        .set('Authorization', helpers.makeAuthHeader(testUsers[0]))
+                        .expect(expectedPlant)
+                })
+            })
+        })
+    })
 })
