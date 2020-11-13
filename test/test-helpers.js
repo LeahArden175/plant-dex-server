@@ -34,20 +34,23 @@ function makeUsersArray() {
     {
       username: "dunder",
       full_name: "Dunder Mifflin",
-      nickname: null,
+      nickname: 'test',
       password: "password",
+      id: 1
     },
     {
       username: "leah",
       full_name: "Leah Arden",
       nickname: "leah",
-      password: "paswsword",
+      password: "password",
+      id: 2
     },
     {
       username: "scoops",
       full_name: "Nick Dardaris",
       nickname: "scoops",
-      password: "paswsword",
+      password: "password",
+      id: 3
     },
   ];
 }
