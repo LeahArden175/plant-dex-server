@@ -30,8 +30,8 @@ plantsRouter
             .catch(next)
     })
     .post(requireAuth, jsonParser, (req, res, next) => {
-        const {nickname,scientificname, datepurchased, purchaseplace, user_id} = req.body
-        const newPlant = {nickname,scientificname, datepurchased, purchaseplace, user_id}
+        const {nickname,scientificname, datepurchased, purchaseplace} = req.body
+        const newPlant = {nickname,scientificname, datepurchased, purchaseplace}
         
         for(const [key, value] of Object.entries(newPlant)) {
             if( value == null) {
@@ -87,7 +87,7 @@ plantsRouter
         .catch(next)
     })
     .patch(jsonParser, (req, res, next) => {
-        const {nickname, scientificname, datepurchased, purchaseplace, user_id} = req.body
+        const {nickname, scientificname, datepurchased, purchaseplace} = req.body
         const plantToUpdate = {nickname, scientificname, datepurchased, purchaseplace}
 
         const numberOfValues = Object.values(plantToUpdate).filter(Boolean).length
@@ -103,7 +103,7 @@ plantsRouter
              plantToUpdate
          )
          .then(numRowsAffected => {
-             res.status(204).json(numRowsAffected)
+             res.status(200).json(numRowsAffected)
          })
          .catch(next)
     })
