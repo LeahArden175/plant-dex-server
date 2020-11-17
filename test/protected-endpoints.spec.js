@@ -38,7 +38,7 @@ describe("Protected endpoints", function () {
   ]
 
   protectedEndpoints.forEach(endpoint => {
-      describe.only(endpoint.name, () => {
+      describe(endpoint.name, () => {
           it('responds with 401 missing bearer token when no bearer token', () => {
               return endpoint.method(endpoint.path)
                 .expect(401, {error: `Missing bearer token`})
