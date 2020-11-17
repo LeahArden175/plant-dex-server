@@ -30,8 +30,8 @@ plantsRouter
             .catch(next)
     })
     .post(requireAuth, jsonParser, (req, res, next) => {
-        const {nickname,scientificname, datepurchased, purchaseplace} = req.body
-        const newPlant = {nickname,scientificname, datepurchased, purchaseplace}
+        const {nickname,scientificname, datepurchased, purchaseplace, days_between_watering, date_last_watered} = req.body
+        const newPlant = {nickname,scientificname, datepurchased, purchaseplace, days_between_watering, date_last_watered}
         
         for(const [key, value] of Object.entries(newPlant)) {
             if( value == null) {
@@ -41,6 +41,9 @@ plantsRouter
             }
         }
         newPlant.user_id = req.user.id
+        // newPlant.date_last_watered = req.date_last_watered
+        // newPlant.days_between_watering = req.days_between_watering
+
         PlantsService.insertPlant(
             req.app.get('db'),
             newPlant
@@ -87,13 +90,13 @@ plantsRouter
         .catch(next)
     })
     .patch(jsonParser, (req, res, next) => {
-        const {nickname, scientificname, datepurchased, purchaseplace} = req.body
-        const plantToUpdate = {nickname, scientificname, datepurchased, purchaseplace}
+        const {nickname, scientificname, datepurchased, purchaseplace, days_between_watering} = req.body
+        const plantToUpdate = {nickname, scientificname, datepurchased, purchaseplace, days_between_watering}
 
         const numberOfValues = Object.values(plantToUpdate).filter(Boolean).length
          if(numberOfValues === 0) {
              return res.status(400).json({
-                 error: { message : `Request body must contain either nickname, scientificname, datepurchased, or purchaseplace`}
+                 error: { message : `Request body must contain either nickname, scientificname, datepurchased, days_between_watering, or purchaseplace`}
              })
          }
 

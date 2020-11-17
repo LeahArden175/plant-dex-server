@@ -4,6 +4,8 @@ const PlantsService = {
     getAllPlants(knex) {
         return knex
         .select('*')
+        .orderBy('datepurchased')
+        .orderBy('id')
         .from('plant_dex_plant_info')
     },
     insertPlant(knex, newPlant) {
