@@ -1,12 +1,13 @@
 const knex = require('knex');
 
 const PlantsService = {
-    getAllPlants(knex) {
+    getAllPlants(knex, id) {
         return knex
         .select('*')
         .orderBy('datepurchased')
         .orderBy('id')
         .from('plant_dex_plant_info')
+        .where({ user_id: id })
     },
     insertPlant(knex, newPlant) {
         return knex

@@ -23,7 +23,7 @@ plantsRouter
     .all(requireAuth)
     .get((req, res, next) => {
         const knexInstance = req.app.get('db')
-        PlantsService.getAllPlants(knexInstance)
+        PlantsService.getAllPlants(knexInstance, req.user.id)
             .then((plants) => {
                 res.json(plants)
             })
