@@ -12,10 +12,12 @@ const jsonParser = express.json()
 const serializePlant = plant => ({
     id: plant.id,
     purchaseplace: xss(plant.purchaseplace),
-    scientificname: xss(plant.title), //sanitize title
-    nickname: xss(plant.content),  //sanitize content
-    datepurchased: plant.date_published,
-    user_id: plant.user,
+    scientificname: xss(plant.scientificname), //sanitize title
+    nickname: xss(plant.nickname),  //sanitize content
+    datepurchased: plant.datepurchased,
+    days_between_watering: plant.days_between_watering,
+    date_last_watered: plant.date_last_watered,
+    user_id: plant.user_id,
 })
 
 plantsRouter
@@ -25,7 +27,7 @@ plantsRouter
         const knexInstance = req.app.get('db')
         PlantsService.getAllPlants(knexInstance, req.user.id)
             .then((plants) => {
-                res.json(plants)
+                res.json(plants.map(serializePlant))
             })
             .catch(next)
     })
@@ -51,7 +53,7 @@ plantsRouter
             res
                 .status(201)
                 .location(path.posix.join(req.originalUrl, `/${plant.id}`))
-                .json(plant)
+                .json(serializePlant(plant))
         })
         .catch(next)
     })
@@ -76,7 +78,7 @@ plantsRouter
         .catch(next)
     })
     .get((req, res, next) => {
-        res.json(res.plant)
+        res.json(serializePlant(res.plant))
     })
     .delete((req, res, next) => {
         PlantsService.deletePlant(

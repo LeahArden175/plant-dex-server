@@ -70,18 +70,19 @@ function makeAuthHeader(user, secret = process.env.JWT_SECRET) {
 function makeMaliciousPlant() {
   const maliciousPlant = {
     id: 911,
-    purchaseplace: "Test Nickname",
+    purchaseplace: 'Naughty naughty very naughty <script>alert("xss");</script>',
     datepurchased: new Date().toISOString(),
-    scientificname:
-      'Naughty naughty very naughty <script>alert("xss");</script>',
-    nickname: `Bad image <img src="https://url.to.file.which/does-not.exist" onerror="alert(document.cookie);">. But not <strong>all</strong> bad.`,
+    scientificname:'Naughty naughty very naughty <script>alert("xss");</script>',
+    nickname: 'Naughty naughty very naughty <script>alert("xss");</script>',
+    date_last_watered: new Date().toISOString(),
+    days_between_watering: 5,
     user_id: 1,
   };
   const expectedPlant = {
     ...maliciousPlant,
-    scientificname:
-      'Naughty naughty very naughty &lt;script&gt;alert("xss");&lt;/script&gt;',
-    nickname: `Bad image <img src="https://url.to.file.which/does-not.exist">. But not <strong>all</strong> bad.`,
+    scientificname:'Naughty naughty very naughty &lt;script&gt;alert("xss");&lt;/script&gt;',
+    nickname: 'Naughty naughty very naughty &lt;script&gt;alert("xss");&lt;/script&gt;',
+    purchaseplace: 'Naughty naughty very naughty &lt;script&gt;alert("xss");&lt;/script&gt;',
   };
   return {
     maliciousPlant,

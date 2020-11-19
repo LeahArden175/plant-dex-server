@@ -4,7 +4,6 @@ const app = require('../src/app')
 const supertest = require('supertest')
 const helpers = require('./test-helpers')
 const { default: expectCt } = require('helmet/dist/middlewares/expect-ct')
-const { requireAuth } = require('../src/middleware/basic-auth')
 
 describe('Plants Endpoints', function() {
 
@@ -71,6 +70,34 @@ describe('Plants Endpoints', function() {
                     .expect(200, testPlants)
             })
         })
+
+        context('Given an XSS attack plant', () => {
+            const testUsers = helpers.makeUsersArray()
+            const {maliciousPlant, expectedPlant} = helpers.makeMaliciousPlant()
+
+            beforeEach('insert malicious plant', () => {
+                return db
+                    .into('plant_dex_users')
+                    .insert(testUsers)
+                    .then(() => {
+                        return db
+                            .into('plant_dex_plant_info')
+                            .insert([ maliciousPlant ])
+                    })
+            })
+
+            it('removes the XSS attack content', () => {
+                return supertest(app)
+                    .get('/api/plants')
+                    .set('Authorization', helpers.makeAuthHeader(testUsers[0]))
+                    .expect(200)
+                    .expect(res => {
+                        expect(res.body[0].purchaseplace).to.eql(expectedPlant.purchaseplace)
+                        expect(res.body[0].scientificname).to.eql(expectedPlant.scientificname)
+                        expect(res.body[0].nickname).to.eql(expectedPlant.nickname)
+                    })
+            })
+        })
     })
 
     describe('GET /plants/:plant_id', () => {
@@ -118,6 +145,35 @@ describe('Plants Endpoints', function() {
                 .get(`/api/plants/${plant_id}`)
                 .set('Authorization', helpers.makeAuthHeader(testUsers[0]))
                 .expect(200, expectedPlant)
+            })
+
+        })
+
+        context('Given an xss attack plant', () => {
+            const testUsers = helpers.makeUsersArray()
+            const {maliciousPlant, expectedPlant} = helpers.makeMaliciousPlant()
+
+            beforeEach('insert malcious plant', () => {
+                return db
+                    .into('plant_dex_users')
+                    .insert(testUsers)
+                    .then(() => {
+                        return db
+                            .into('plant_dex_plant_info')
+                            .insert([maliciousPlant])
+                    })
+            })
+
+            it('removes XSS attack content', () => {
+                return supertest(app)
+                    .get(`/api/plants/${maliciousPlant.id}`)
+                    .set('Authorization', helpers.makeAuthHeader(testUsers[0]))
+                    .expect(200)
+                    .expect(res => {
+                        expect(res.body.scientificname).to.eql(expectedPlant.scientificname)
+                        expect(res.body.purchaseplace).to.eql(expectedPlant.purchaseplace)
+                        expect(res.body.nickname).to.eql(expectedPlant.nickname)
+                    })
             })
         })
     }) 
@@ -185,6 +241,20 @@ describe('Plants Endpoints', function() {
                     .send(newPlant)
                     .expect(400, {
                         error: { message: `Missing ${field} in request body` }
+                    })
+            })
+            it('removes an XSS attack', () => {
+                const {maliciousPlant, expectedPlant} = helpers.makeMaliciousPlant()
+
+                return supertest(app)
+                    .post('/api/plants')
+                    .set('Authorization', helpers.makeAuthHeader(testUsers[0]))
+                    .send(maliciousPlant)
+                    .expect(201)
+                    .expect(res => {
+                        expect(res.body.scientificname).to.eql(expectedPlant.scientificname)
+                        expect(res.body.nickname).to.eql(expectedPlant.nickname)
+                        expect(res.body.purchaseplace).to.eql(expectedPlant.purchaseplace)
                     })
             })
         })
