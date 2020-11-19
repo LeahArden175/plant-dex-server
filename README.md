@@ -1,7 +1,15 @@
 Plant-Dex API
 
-This is the backend for Plant-Dex. A live version of the app
-can be found at https://plant-dex.vercel.app/
+Keep your house plants in one place! This app allows users to
+create a list of their house plants and create a watering schedule.
+
+This is the backend for Plant-Dex. 
+
+A live version of the app can be found at https://plant-dex.vercel.app/
+
+The front end code can be found at https://github.com/LeahArden175/plantdex-client
+
+-------------------------
 
 Back End
 
@@ -20,3 +28,5 @@ Back End
 Production
 
     -Deployed using Heroku
+
+    
