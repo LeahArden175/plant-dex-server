@@ -40,6 +40,7 @@ plantsRouter
                 })
             }
         }
+        
         newPlant.user_id = req.user.id
 
         PlantsService.insertPlant(

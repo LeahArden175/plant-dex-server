@@ -9,6 +9,8 @@ function makePlantInfoArray() {
       scientificname: "Pilea Peperomiodes",
       datepurchased: "2020-01-22T00:00:00.000Z",
       purchaseplace: "Father Natures",
+      date_last_watered: "2020-01-22T00:00:00.000Z",
+      days_between_watering: 5,
       user_id: 1,
     },
     {
@@ -17,6 +19,8 @@ function makePlantInfoArray() {
       scientificname: "Calathea Musaica",
       datepurchased: "2020-01-22T00:00:00.000Z",
       purchaseplace: "Plant Vine",
+      date_last_watered: "2020-01-22T00:00:00.000Z",
+      days_between_watering: 5,
       user_id: 1,
     },
     {
@@ -25,6 +29,8 @@ function makePlantInfoArray() {
       scientificname: "Monstera Deliciosa",
       datepurchased: "2020-01-22T00:00:00.000Z",
       purchaseplace: "Plant Vine",
+      date_last_watered: "2020-01-22T00:00:00.000Z",
+      days_between_watering: 5,
       user_id: 1,
     },
   ];

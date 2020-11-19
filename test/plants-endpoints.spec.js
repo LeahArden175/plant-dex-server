@@ -137,6 +137,8 @@ describe('Plants Endpoints', function() {
                 "scientificname": 'TEST PLANT',
                 "datepurchased": '2020-01-22T00:00:00.000Z',
                 "purchaseplace": 'TEST PLANT',
+                "date_last_watered": '2020-01-22T00:00:00.000Z',
+                "days_between_watering": 5,
                 "user_id": 1
               }
 
@@ -150,6 +152,8 @@ describe('Plants Endpoints', function() {
                   expect(res.body.scientificname).to.eql(newPlant.scientificname)
                   expect(res.body.datepurchased).to.eql(newPlant.datepurchased)
                   expect(res.body.purchaseplace).to.eql(newPlant.purchaseplace)
+                  expect(res.body.date_last_watered).to.eql(newPlant.date_last_watered)
+                  expect(res.body.days_between_watering).to.eql(newPlant.days_between_watering)
                   expect(res.body.user_id).to.eql(newPlant.user_id)
                   expect(res.body).to.have.property('id')
                   expect(res.headers.location).to.eql(`/api/plants/${res.body.id}`)
@@ -161,7 +165,7 @@ describe('Plants Endpoints', function() {
                 }) 
         })
 
-        const requiredFields = ['nickname', 'scientificname', 'user_id', 'datepurchased', 'purchaseplace']
+        const requiredFields = ['nickname', 'scientificname', 'datepurchased', 'purchaseplace', 'date_last_watered', 'days_between_watering']
 
         requiredFields.forEach((field) =>{
             const newPlant = {
@@ -169,7 +173,8 @@ describe('Plants Endpoints', function() {
                 scientificname : 'TEST PLANT',
                 datepurchased : '2020-01-22T00:00:00.000Z',
                 purchaseplace : 'TEST PLANT',
-                user_id : testUsers[2].id
+                date_last_watered: '2020-01-22T00:00:00.000Z',
+                days_between_watering: 5
             }
             it(`responds with 400 and an error message when the '${field}' is missing`, () => {
                 delete newPlant[field]
@@ -269,7 +274,7 @@ describe('Plants Endpoints', function() {
                             .insert(testPlants)
                     })
             })
-            it('responds with 204 and updates plant', () => {
+            it('responds with 200 and updates plant', () => {
                 const idToUpdate = 2
                 const updatePlant = {
                     nickname: 'updated',
@@ -286,7 +291,7 @@ describe('Plants Endpoints', function() {
                     .patch(`/api/plants/${idToUpdate}`)
                     .set('Authorization', helpers.makeAuthHeader(testUsers[0]))
                     .send(updatePlant)
-                    .expect(204)
+                    .expect(200)
                     .then(res => {
                         supertest(app)
                             .get(`/api/plants/${idToUpdate}`)
@@ -301,10 +306,10 @@ describe('Plants Endpoints', function() {
                     .set('Authorization', helpers.makeAuthHeader(testUsers[0]))
                     .send({irrelevantField : 'foo' })
                     .expect(400, {
-                        error: {message: 'Request body must contain either nickname, scientificname, datepurchased, or purchaseplace'}
+                        error: {message: 'Request body must contain either nickname, scientificname, datepurchased, days_between_watering, or purchaseplace'}
                     })
             })
-            it('responds wth 204 when only editing some fields', () => {
+            it('responds wth 200 when only editing some fields', () => {
                 const idToUpdate = 2
                 const updatePlant = {
                     nickname : 'updated name'
@@ -321,7 +326,7 @@ describe('Plants Endpoints', function() {
                     ...updatePlant,
                     fieldToIgnore: 'Should not be in GET response'
                 })
-                .expect(204)
+                .expect(200)
                 .then(res => {
                     supertest(app)
                         .get(`/api/plants/${idToUpdate}`)
