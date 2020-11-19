@@ -69,7 +69,6 @@ usersRouter
 
 usersRouter
   .route("/:user_id")
-  // .all(requireAuth)
   .all((req, res, next) => {
     UsersService.getById(req.app.get("db"), req.params.user_id)
       .then((user) => {

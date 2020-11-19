@@ -41,8 +41,6 @@ plantsRouter
             }
         }
         newPlant.user_id = req.user.id
-        // newPlant.date_last_watered = req.date_last_watered
-        // newPlant.days_between_watering = req.days_between_watering
 
         PlantsService.insertPlant(
             req.app.get('db'),
