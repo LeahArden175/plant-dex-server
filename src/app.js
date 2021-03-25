@@ -27,6 +27,9 @@ app.use('/api/auth', authRouter)
 app.get('/', (req, res) =>{
     res.send('Hello, boilerplate!')
 })
+app.get('/wow', (req, res) => {
+    res.send('Please work')
+})
 
 app.use(function errorHandler(error, req, res, next) {
     let response
